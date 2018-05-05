@@ -2,7 +2,6 @@ package io.blocko.simpledapp;
 
 import io.blocko.coinstack.BasicEndpoint;
 import io.blocko.coinstack.CoinStackClient;
-import io.blocko.coinstack.ECKey;
 import io.blocko.coinstack.LuaContractBuilder;
 import io.blocko.coinstack.TransactionUtil;
 import io.blocko.coinstack.exception.CoinStackException;
@@ -11,69 +10,89 @@ import io.blocko.coinstack.model.ContractBody;
 import io.blocko.coinstack.model.ContractResult;
 import io.blocko.json.JSONException;
 import io.blocko.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class SmartContract {
-  
+
   private static int PRINT_INDENT = 2;
 
   private static long FEE = 10000L;
 
-  protected CoinStackClient client;
+  private CoinStackClient client;
 
-  protected String contractAddress;
+  // same as contract id
+  private String contractAddress;
 
-  protected String contractPrivatekey;
-
-  public SmartContract(final String endpoint, final String privatekey)
+  public SmartContract(final String endpoint, final String contractAddress)
       throws MalformedInputException {
-    this.client = new CoinStackClient(null, null, new BasicEndpoint(endpoint));
-    this.contractAddress = ECKey.deriveAddress(privatekey);
-    this.contractPrivatekey = privatekey;
+    setClientWithEndpoint(endpoint);
+    setContractAddress(contractAddress);
   }
 
-  public void define(final String code) throws IOException, CoinStackException {
+  public CoinStackClient getClient() {
+    return client;
+  }
+
+  public void setClientWithEndpoint(final String endpoint) {
+    this.client = new CoinStackClient(null, null, new BasicEndpoint(endpoint));
+  }
+
+  private void setContractAddress(String contractAddress) {
+    this.contractAddress = contractAddress;
+  }
+
+  public String getContractAddress() {
+    return contractAddress;
+  }
+
+  public void define(final String code, final String creatorPrivatekey)
+      throws IOException, CoinStackException {
     final LuaContractBuilder lcBuilder = new LuaContractBuilder();
-    lcBuilder.setContractId(contractAddress);
+    lcBuilder.setContractId(getContractAddress());
+    lcBuilder.setFee(FEE);
     lcBuilder.setDefinition(code);
 
-    String rawTx = lcBuilder.buildTransaction(client, contractPrivatekey);
-    client.sendTransaction(rawTx);
-    String txHash = TransactionUtil.getTransactionHash(rawTx);
+    String rawTx = lcBuilder.buildTransaction(getClient(), creatorPrivatekey);
+    getClient().sendTransaction(rawTx);
 
+    String txHash = TransactionUtil.getTransactionHash(rawTx);
     System.out.println("=== Function definition ===");
-    System.out.println("tx: " + txHash);
-    System.out.println("code:");
+    System.out.println("creator : " + creatorPrivatekey);
+    System.out.println("contract id : " + getContractAddress());
+    System.out.println("tx : " + txHash);
+    System.out.println("code :");
     System.out.println(code);
   }
 
-  public void execute(final String code) throws IOException, CoinStackException {
-    LuaContractBuilder lcBuilder = new LuaContractBuilder();
-    lcBuilder.setContractId(contractAddress);
+  public void execute(final String code, final String senderPrivatekey)
+      throws IOException, CoinStackException {
+    final LuaContractBuilder lcBuilder = new LuaContractBuilder();
+    lcBuilder.setContractId(getContractAddress());
     lcBuilder.setFee(FEE);
     lcBuilder.setExecution(code);
 
-    String rawTx = lcBuilder.buildTransaction(client, contractPrivatekey);
-    String txHash = TransactionUtil.getTransactionHash(rawTx);
-    client.sendTransaction(rawTx);
+    String rawTx = lcBuilder.buildTransaction(getClient(), senderPrivatekey);
+    getClient().sendTransaction(rawTx);
 
+    String txHash = TransactionUtil.getTransactionHash(rawTx);
     System.out.println("=== Function execution ===");
-    System.out.println("tx: " + txHash);
-    System.out.println("code:");
+    System.out.println("creator : " + senderPrivatekey);
+    System.out.println("contract id : " + getContractAddress());
+    System.out.println("tx : " + txHash);
+    System.out.println("code :");
     System.out.println(code);
   }
 
   public JSONObject query(final String code) throws CoinStackException, IOException, JSONException {
-    ContractResult contractResult =
-        client.queryContract(contractAddress, ContractBody.TYPE_LSC, code);
+    final ContractResult contractResult =
+        getClient().queryContract(getContractAddress(), ContractBody.TYPE_LSC, code);
     JSONObject queryResult = null;
     if (null != contractResult) {
       queryResult = contractResult.asJson();
     }
 
     System.out.println("=== Query ===");
+    System.out.println("contract id : " + getContractAddress());
     System.out.println("code:");
     System.out.println(code);
     System.out.println("result:");
