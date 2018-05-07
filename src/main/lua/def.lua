@@ -1,4 +1,5 @@
 local system = require("system");
+local json = require("json");
 
 ----------------------------------------------------------
 -- Get a current market
@@ -8,73 +9,89 @@ local system = require("system");
 local function getMarket()
   local market = system.getItem("market")
   if market == nil then
-    market = {}
-    system.setItem("market", market)
+    system.setItem("market", {})
+    registerEvents()
   end
   return market
 end
 
 ----------------------------------------------------------
+-- Register events
+----------------------------------------------------------
+local function registerEvents()
+  local smartOracleEndpoint = "http://localhost:9000/event"
+  local miningAddress = "141xLCiRBmAjBxGxRv3YwAvCTkTjYMLWtP"
+  system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
+  system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
+  system.registEvent("CONFIRM_EVENT", smartOracleEndpoint, miningAddress)
+end
+
+----------------------------------------------------------
 -- Update market state
--- @param goodsName goods name
+-- @param uuid goods identifier
 -- @param goods goods
 ----------------------------------------------------------
-local function updateMarket(goodsName, goods)
+local function updateMarket(uuid, goods)
   local market = getMarket()
-  market[goodsName] = goods
+  market[uuid] = goods
   system.setItem("market", market)
 end
 
-----------------------------------------------------------
--- Reset a market
-----------------------------------------------------------
-function resetMarket()
-  system.setItem("market", {})
-end
+
 
 ----------------------------------------------------------
 -- Issue a new goods
+-- @param uuid goods identifier
 -- @param goodsName goods name
--- @param owner goods owner
 -- @param price goods price
 ----------------------------------------------------------
-function issue(goodsName, owner, price)
+function issue(uuid, goodsName, price)
   local goods = {}
-  goods["owner"] = owner
+  goods["goodsName"] = goodsName
   goods["price"] = price
-  goods["state"] = "Selling"
+  goods["owner"] = system.getSender() 
   goods["buyer"] = nil
-  updateMarket(goodsName, goods)
+  goods["state"] = "Selling"
+  updateMarket(uuid, goods)
+
+  local goodsName = goods["goodsName"]
+  system.pushEvent("ISSUE_EVENT", {uuid, owner, goodsName})
 end
 
 ----------------------------------------------------------
--- Make a buy request to the goods whose name is goodsName
--- State of goods must be 'Selling' and
--- owner of goods must be different with buyer
--- @param goodsName goods name
--- @param buyer goods buyer
+-- Make a buy request to the goods with correponding uuid
+-- Owner of goods must be different with buyer and
+-- state of goods must be 'Selling'
+-- @param uuid goods identifier
 ----------------------------------------------------------
-function buy(goodsName, buyer)
-  local goods = getMarket()[goodsName]
+function buy(uuid)
+  local goods = getMarket()[uuid]
+  local buyer = system.getSender()
   if goods ~= nil and goods["owner"] ~= buyer and goods["state"] == "Selling" then
-    goods["state"] = "Requested"
     goods["buyer"] = buyer
-    updateMarket(goodsName, goods)
+    goods["state"] = "Requested"
+    updateMarket(uuid, goods)
+
+    local goodsName = goods["goodsName"]
+    system.pushEvent("BUY_EVENT", {uuid, buyer, goodsName})
   end
 end
 
 ----------------------------------------------------------
 -- Confirm a buy request
--- State of goods must be 'Requested' and
--- owner of goods must be identical with owner
--- @param goodsName goods name
--- @param owner goods owner
+-- Owner of goods must be identical with sender and
+-- state of goods must be 'Requested'
+-- @param uuid goods identifier
 ----------------------------------------------------------
-function confirm(goodsName, owner)
-  local goods = getMarket()[goodsName]
+function confirm(uuid)
+  local goods = getMarket()[uuid]
+  local owner = system.getSender()
   if goods ~= nil and goods["owner"] == owner and goods["state"] == "Requested" then
     goods["state"] = "Sold"
-    updateMarket(goodsName, goods)
+    updateMarket(uuid, goods)
+
+    local goodsName = goods["goodsName"]
+    system.pushEvent("CONFIRM_EVENT", {uuid, owner, goodsName})
   end
 end
 
@@ -84,4 +101,11 @@ end
 ----------------------------------------------------------
 function showMarket()
   return system.getItem("market")
+end
+
+----------------------------------------------------------
+-- Reset a market
+----------------------------------------------------------
+function resetMarket()
+  system.setItem("market", nil)
 end
