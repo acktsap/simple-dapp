@@ -1,6 +1,7 @@
 package io.blocko.simpledapp;
 
 import static io.blocko.simpledapp.ServletConstants.ENDPOINT;
+
 import java.io.IOException;
 import java.util.UUID;
 import javax.servlet.RequestDispatcher;
@@ -30,7 +31,7 @@ public class IssueServlet extends HttpServlet {
     final String goodsName = req.getParameter("goodsName");
     final Integer price = Integer.valueOf(req.getParameter("price"));
 
-    final String issueCode = makeCode("issue", uuid, goodsName, price);
+    final String issueCode = LuaCodeUtils.makeExecutionCode("issue", uuid, goodsName, price);
 
     try {
       SmartContract smartContract = new SmartContract(ENDPOINT, contractId);
@@ -40,33 +41,6 @@ public class IssueServlet extends HttpServlet {
     }
 
     req.getRequestDispatcher("issue.jsp").forward(req, resp);
-  }
-
-  /**
-   * Make a code with function name and arguments.
-   * 
-   * @param funcName function name
-   * @param args arguments 
-   * @return generated code
-   */
-  protected String makeCode(final String funcName, final Object... args) {
-    final StringBuffer buffer = new StringBuffer();
-    buffer.append("ret, ok = call(");
-    buffer.append('\"');
-    buffer.append(funcName);
-    buffer.append('\"');
-    for (final Object arg : args) {
-      buffer.append(", ");
-      if (arg instanceof Integer) {
-        buffer.append(arg);
-      } else { // String
-        buffer.append('\"');
-        buffer.append((String) arg);
-        buffer.append('\"');
-      }
-    }
-    buffer.append("); assert(ok, ret)");
-    return buffer.toString();
   }
 
 }
