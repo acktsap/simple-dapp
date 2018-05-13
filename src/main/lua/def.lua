@@ -2,28 +2,27 @@ local system = require("system");
 local json = require("json");
 
 ----------------------------------------------------------
+-- Register events
+----------------------------------------------------------
+local function registerEvents()
+  local smartOracleEndpoint = "http://192.168.0.6:9000/event"
+  local miningAddress = "141xLCiRBmAjBxGxRv3YwAvCTkTjYMLWtP"
+  system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
+  system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
+  system.registEvent("CONFIRM_EVENT", smartOracleEndpoint, miningAddress)
+end
+
+----------------------------------------------------------
 -- Get a current market
 -- If current market is not defined, define a empty market
 -- @return current market
 ----------------------------------------------------------
 local function getMarket()
   local market = system.getItem("market")
-  if market == nil then
-    system.setItem("market", {})
-    registerEvents()
+  if market == nil then -- doesn't return nil
+    system.setItem("market", {}) -- doesn't need it
   end
   return market
-end
-
-----------------------------------------------------------
--- Register events
-----------------------------------------------------------
-local function registerEvents()
-  local smartOracleEndpoint = "http://localhost:9000/event"
-  local miningAddress = "141xLCiRBmAjBxGxRv3YwAvCTkTjYMLWtP"
-  system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
-  system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
-  system.registEvent("CONFIRM_EVENT", smartOracleEndpoint, miningAddress)
 end
 
 ----------------------------------------------------------
@@ -47,14 +46,15 @@ end
 ----------------------------------------------------------
 function issue(uuid, goodsName, price)
   local goods = {}
+  local owner = system.getSender()
+
   goods["goodsName"] = goodsName
   goods["price"] = price
-  goods["owner"] = system.getSender() 
+  goods["owner"] = owner
   goods["buyer"] = nil
   goods["state"] = "Selling"
   updateMarket(uuid, goods)
 
-  local goodsName = goods["goodsName"]
   system.pushEvent("ISSUE_EVENT", {uuid, owner, goodsName})
 end
 
@@ -108,4 +108,5 @@ end
 ----------------------------------------------------------
 function resetMarket()
   system.setItem("market", nil)
+  registerEvents()
 end
