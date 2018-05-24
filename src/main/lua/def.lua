@@ -5,7 +5,7 @@ local json = require("json");
 -- Register events
 ----------------------------------------------------------
 local function registerEvents()
-  local smartOracleEndpoint = "http://192.168.0.6:9000/event"
+  local smartOracleEndpoint = "http://192.168.1.219:9000/event"
   local miningAddress = "141xLCiRBmAjBxGxRv3YwAvCTkTjYMLWtP"
   system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
   system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
@@ -19,8 +19,10 @@ end
 ----------------------------------------------------------
 local function getMarket()
   local market = system.getItem("market")
-  if market == nil then -- doesn't return nil
-    system.setItem("market", {}) -- doesn't need it
+  if market == nil then
+    market = {}
+    system.setItem("market", market)
+    registerEvents()
   end
   return market
 end
@@ -45,14 +47,11 @@ end
 -- @param price goods price
 ----------------------------------------------------------
 function issue(uuid, goodsName, price)
-  local goods = {}
   local owner = system.getSender()
-
-  goods["goodsName"] = goodsName
-  goods["price"] = price
-  goods["owner"] = owner
-  goods["buyer"] = nil
-  goods["state"] = "Selling"
+  local goods = {
+    ["goodsName"] = goodsName, ["price"] = price, ["owner"] = owner,
+    ["buyer"] = nil, ["state"] = "Selling"
+  }
   updateMarket(uuid, goods)
 
   system.pushEvent("ISSUE_EVENT", {uuid, owner, goodsName})
@@ -107,6 +106,5 @@ end
 -- Reset a market
 ----------------------------------------------------------
 function resetMarket()
-  system.setItem("market", nil)
-  registerEvents()
+  system.setItem("market", {})
 end

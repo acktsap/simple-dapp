@@ -4,7 +4,18 @@
 <html>
 <head>
 <title>Definition page</title>
+<style>
+ul#header li {
+    display:inline;
+    margin: 0px 10px;
+}
+</style>
 </head>
+<ul id="header">
+    <li><a href="/market">Market</a></li>
+    <li><a href="/issue">Issue</a></li>
+    <li><a href="/def">Definition</a></li>
+</ul>
 <body>
     <form action="/def" method="post">
         <div>
