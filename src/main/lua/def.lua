@@ -106,5 +106,7 @@ end
 -- Reset a market
 ----------------------------------------------------------
 function resetMarket()
-  system.setItem("market", {})
+  if system.getSender() == system.getContractID() then
+    system.setItem("market", {})
+  end
 end
