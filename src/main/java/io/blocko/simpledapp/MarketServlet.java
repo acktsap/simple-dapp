@@ -18,6 +18,7 @@ public class MarketServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    req.setAttribute("defaultContractId", CONTRACT_ADDRESS);
     req.setAttribute("market", queryMarketState());
     req.getRequestDispatcher("market.jsp").forward(req, resp);
   }

@@ -25,7 +25,7 @@ ul#header li {
         </div>
         <div>
             <p>Contract id (address)</p>
-            <input size="37" type="text" name="contractId" />
+            <input size="37" type="text" name="contractId" value="${defaultContractId}">
         </div>
         <div>
             <p>Goods uuid</p>

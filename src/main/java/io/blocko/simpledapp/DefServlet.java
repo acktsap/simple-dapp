@@ -1,5 +1,6 @@
 package io.blocko.simpledapp;
 
+import static io.blocko.simpledapp.ServletConstants.CONTRACT_ADDRESS;
 import static io.blocko.simpledapp.ServletConstants.ENDPOINT;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class DefServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+    req.setAttribute("defaultContractId", CONTRACT_ADDRESS);
     RequestDispatcher view = req.getRequestDispatcher("def.jsp");
     view.forward(req, resp);
   }
