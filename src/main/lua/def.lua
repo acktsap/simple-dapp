@@ -10,6 +10,7 @@ local function registerEvents()
   system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
   system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
   system.registEvent("CONFIRM_EVENT", smartOracleEndpoint, miningAddress)
+  system.print("Register events with endpoint: " .. smartOracleEndpoint)
 end
 
 ----------------------------------------------------------
@@ -33,6 +34,8 @@ end
 -- @param goods goods
 ----------------------------------------------------------
 local function updateMarket(uuid, goods)
+  system.print("Update market with goods:")
+  system.print(goods)
   local market = getMarket()
   market[uuid] = goods
   system.setItem("market", market)
@@ -104,9 +107,13 @@ end
 
 ----------------------------------------------------------
 -- Reset a market
+-- Accepted only if sender is the smart contract
 ----------------------------------------------------------
 function resetMarket()
   if system.getSender() == system.getContractID() then
+    system.print("Reset the market")
     system.setItem("market", {})
+  else
+    system.print("Resetting rejected : sender is not the contract")
   end
 end
