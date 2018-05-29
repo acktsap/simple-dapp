@@ -45,6 +45,14 @@ public class SmartContract {
     return contractAddress;
   }
 
+  /**
+   * Define a smart contract.
+   * 
+   * @param code smart contract definition code
+   * @param contractPrivatekey contract private key to sign on transaction
+   * @throws IOException when building or sending transaction failed
+   * @throws CoinStackException when any of coinstack processing failed
+   */
   public void define(final String code, final String contractPrivatekey)
       throws IOException, CoinStackException {
     final LuaContractBuilder lcBuilder = new LuaContractBuilder();
@@ -64,6 +72,14 @@ public class SmartContract {
     System.out.println(code);
   }
 
+  /**
+   * Execute a smart contract.
+   * 
+   * @param code smart contract execution code
+   * @param senderPrivatekey sender private key to sign on transaction
+   * @throws IOException when building or sending transaction failed
+   * @throws CoinStackException when any of coinstack processing failed
+   */
   public void execute(final String code, final String senderPrivatekey)
       throws IOException, CoinStackException {
     final LuaContractBuilder lcBuilder = new LuaContractBuilder();
@@ -83,7 +99,16 @@ public class SmartContract {
     System.out.println(code);
   }
 
-  public JSONObject query(final String code) throws CoinStackException, IOException, JSONException {
+  /**
+   * Query a state made by smart contract.
+   * 
+   * @param code query code.
+   * @return query result in json format
+   * @throws IOException when building or sending transaction failed
+   * @throws CoinStackException when any of coinstack processing failed
+   * @throws JSONException when json processing failed
+   */
+  public JSONObject query(final String code) throws IOException, CoinStackException, JSONException {
     final ContractResult contractResult =
         getClient().queryContract(getContractAddress(), ContractBody.TYPE_LSC, code);
     JSONObject queryResult = null;
