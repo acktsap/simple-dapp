@@ -45,19 +45,19 @@ public class SmartContract {
     return contractAddress;
   }
 
-  public void define(final String code, final String creatorPrivatekey)
+  public void define(final String code, final String contractPrivatekey)
       throws IOException, CoinStackException {
     final LuaContractBuilder lcBuilder = new LuaContractBuilder();
     lcBuilder.setContractId(getContractAddress());
     lcBuilder.setFee(FEE);
     lcBuilder.setDefinition(code);
 
-    String rawTx = lcBuilder.buildTransaction(getClient(), creatorPrivatekey);
+    String rawTx = lcBuilder.buildTransaction(getClient(), contractPrivatekey);
     getClient().sendTransaction(rawTx);
 
     String txHash = TransactionUtil.getTransactionHash(rawTx);
     System.out.println("=== Function definition ===");
-    System.out.println("creator : " + creatorPrivatekey);
+    System.out.println("contract private key : " + contractPrivatekey);
     System.out.println("contract id : " + getContractAddress());
     System.out.println("tx : " + txHash);
     System.out.println("code :");
@@ -76,7 +76,7 @@ public class SmartContract {
 
     String txHash = TransactionUtil.getTransactionHash(rawTx);
     System.out.println("=== Function execution ===");
-    System.out.println("creator : " + senderPrivatekey);
+    System.out.println("sender : " + senderPrivatekey);
     System.out.println("contract id : " + getContractAddress());
     System.out.println("tx : " + txHash);
     System.out.println("code :");

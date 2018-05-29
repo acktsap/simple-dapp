@@ -26,13 +26,13 @@ public class DefServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    final String creatorPrivatekey = req.getParameter("creator");
+    final String contractPrivatekey = req.getParameter("contractPrivatekey");
     final String contractId = req.getParameter("contractId");
     final String code = req.getParameter("code");
 
     try {
       SmartContract smartContract = new SmartContract(ENDPOINT, contractId);
-      smartContract.define(code, creatorPrivatekey);
+      smartContract.define(code, contractPrivatekey);
     } catch (Exception e) {
       e.printStackTrace();
     }

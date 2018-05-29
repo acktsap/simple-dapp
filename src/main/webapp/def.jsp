@@ -19,8 +19,8 @@ ul#header li {
 <body>
     <form action="/def" method="post">
         <div>
-            <p>Creator private key</p>
-            <input size="60" type="text" name="creator" />
+            <p>Contract private key</p>
+            <input size="60" type="text" name="contractPrivatekey" />
         </div>
         <div>
             <p>Contract id (address)</p>
