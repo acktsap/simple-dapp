@@ -5,7 +5,8 @@ local json = require("json");
 -- Register events
 ----------------------------------------------------------
 local function registerEvents()
-  local smartOracleEndpoint = "http:///52.231.156.231:9000/event"
+  -- TODO : type your smart oracle endpoint
+  local smartOracleEndpoint = "http:///localhost:9000/event"
   local miningAddress = "141xLCiRBmAjBxGxRv3YwAvCTkTjYMLWtP"
   system.registEvent("ISSUE_EVENT", smartOracleEndpoint, miningAddress)
   system.registEvent("BUY_EVENT", smartOracleEndpoint, miningAddress)
