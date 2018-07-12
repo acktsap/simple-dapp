@@ -13,7 +13,7 @@ ul#header li {
 </style>
 </head>
 <ul id="header">
-    <li><a href="/market">Market</a></li>
+    <li><a href="/market" style="background-color: darkgrey;">Market</a></li>
     <li><a href="/issue">Issue</a></li>
     <li><a href="/def">Definition</a></li>
 </ul>

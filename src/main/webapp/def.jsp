@@ -14,7 +14,7 @@ ul#header li {
 <ul id="header">
     <li><a href="/market">Market</a></li>
     <li><a href="/issue">Issue</a></li>
-    <li><a href="/def">Definition</a></li>
+    <li><a href="/def" style="background-color: darkgrey;">Definition</a></li>
 </ul>
 <body>
     <form action="/def" method="post">
