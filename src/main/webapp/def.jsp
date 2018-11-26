@@ -1,10 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Market page</title>
+<title>Definition page</title>
 <style>
 ul#header li {
     display:inline;
@@ -13,32 +12,28 @@ ul#header li {
 </style>
 </head>
 <ul id="header">
-    <li><a href="/market" style="background-color: darkgrey;">Market</a></li>
+    <li><a href="/market">Market</a></li>
     <li><a href="/issue">Issue</a></li>
-    <li><a href="/def">Definition</a></li>
+    <li><a href="/def" style="background-color: darkgrey;">Definition</a></li>
 </ul>
 <body>
-    <form action="/market" method="post">
+    <form action="/def" method="post">
         <div>
-            <p>Sender private key</p>
-            <input size="60" type="text" name="sender" />
+            <p>Contract private key</p>
+            <input size="60" type="text" name="contractPrivatekey" />
         </div>
         <div>
             <p>Contract id (address)</p>
             <input size="37" type="text" name="contractId" value="${defaultContractId}">
         </div>
         <div>
-            <p>Goods uuid</p>
-            <input size="40" type="text" name="uuid" />
+            <p>Definition code</p>
+            <textarea rows="40" cols="100" name="code"></textarea>
         </div>
         <div>
             <p></p>
-            <input type="submit" name="buttonType" value="Buy">
-            <input type="submit" name="buttonType" value="Confirm">
+            <input type="submit" value="Request">
         </div>
     </form>
-    <div>
-        <pre>${market}</pre>
-    </div>
 </body>
 </html>
